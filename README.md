@@ -25,3 +25,5 @@ This code should be added to the top of the main function of the tool so that it
             download_url = f"https://raw.githubusercontent.com/GITHUB USERNAME/REPO NAME/main/releases/TOOL NAME_{latest_version}.exe" ### CHANGE THIS TO REPO URL
             AutoUpdate.check_for_updates(local_version, local_dir, latest_version, download_url)
     ### rest of code...
+
+The code in capitals should be replaced with either your GitHub username, repo name, or tool name 
