@@ -26,4 +26,4 @@ This code should be added to the top of the main function of the tool so that it
             AutoUpdate.check_for_updates(local_version, local_dir, latest_version, download_url)
     ### rest of code...
 
-The code in capitals should be replaced with either your GitHub username, repo name, or tool name 
+The code in capitals (excluding calls of 'COLOUR' class) should be replaced with either your GitHub username, repo name, or tool name 
