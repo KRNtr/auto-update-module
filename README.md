@@ -1,4 +1,4 @@
-### Auto Update Module ###
+# Auto Update Module
 
 This module streamlines the addition of auto-update functionality. This file should be added to the main folder of your script, or the folder of the file that will be referencing the module.
 
