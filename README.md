@@ -4,7 +4,6 @@ This module streamlines the addition of auto-update functionality. This file sho
 
 These lines should be added to the top of the script with other module imports.
 
-  # Module for auto update functionality
     import AutoUpdate
     from AutoUpdate import COLOUR      # Colour class allows the module to output colour to to the terminal 
 
