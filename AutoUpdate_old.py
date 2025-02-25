@@ -18,13 +18,9 @@ class COLOUR:
     CYAN = "\033[0;36m"
     STOP   = '\x1b[0m'
 
-def get_latest_version(url, token=None):
+def get_latest_version(url):
     try:
-        headers = {}
-        if token:
-            headers['Authorization'] = f'token {token}'
-        
-        response = requests.get(url, headers=headers)
+        response = requests.get(url)
         if response.status_code != 200:
             print(f"Status Code error: Status code {response.status_code}")
             return None
@@ -58,7 +54,7 @@ def get_local_version(exe_name):
         print(f"{COLOUR.RED}Could not determine local version. Please check exe filename and report this bug to Kai.{COLOUR.STOP}")
         return None
 
-def check_for_updates(local_version, local_dir, latest_version, download_url, token=None):
+def check_for_updates(local_version, local_dir, latest_version, download_url):
     
     if latest_version and (latest_version != local_version):
         # Compare version numbers
@@ -68,18 +64,14 @@ def check_for_updates(local_version, local_dir, latest_version, download_url, to
         if latest_version_num > local_version_num:
             print(f"{COLOUR.YELLOW}New version available: {latest_version}{COLOUR.STOP}")
             # Download and install the update
-            download_update(local_version, local_dir, latest_version, download_url, token)
+            download_update(local_version, local_dir, latest_version, download_url)
         else:
             print(f"{COLOUR.GREEN}You are using the latest version.{COLOUR.STOP}")
     else:
         print(f"{COLOUR.GREEN}You are using the latest version.{COLOUR.STOP}")
 
-def download_update(local_version, local_dir, latest_version, download_url, token=None):
-    headers = {}
-    if token:
-        headers['Authorization'] = f'token {token}'
-    
-    response = requests.get(download_url, headers=headers)
+def download_update(local_version, local_dir, latest_version, download_url):
+    response = requests.get(download_url)
     if response.status_code == 200:
         new_file = f"batch_analyser_{latest_version}.exe"
         download_path = os.path.join(local_dir, new_file)
@@ -109,9 +101,9 @@ def download_update(local_version, local_dir, latest_version, download_url, toke
                 @echo off
                 timeout /t 2 >nul
                 del "{current_exe}"
-                start "" "{new_file}"
+                start "" "{current_exe}"
                 del "%~f0"
-                """.format(current_exe=current_exe, new_file=new_file)
+                """.format(current_exe=current_exe, new_file=new_file, current_exe_name=os.path.basename(current_exe))
             else:
                 print(f"{COLOUR.YELLOW}Old version will not be deleted.{COLOUR.STOP}")
         
@@ -124,4 +116,4 @@ def download_update(local_version, local_dir, latest_version, download_url, toke
         subprocess.Popen(bat_file, shell=True)
         sys.exit(0)
     else:
-        print(f"Failed to download the update. Status code: {response.status_code}")
+        print("Failed to download the update.")
