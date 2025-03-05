@@ -58,7 +58,7 @@ def get_local_version(exe_name):
         print(f"{COLOUR.RED}Could not determine local version. Please check exe filename and report this bug to Kai.{COLOUR.STOP}")
         return None
 
-def check_for_updates(local_version, local_dir, latest_version, download_url, token=None):
+def check_for_updates(exe_name, local_version, local_dir, latest_version, download_url, token=None):
     
     if latest_version and (latest_version != local_version):
         # Compare version numbers
@@ -68,20 +68,20 @@ def check_for_updates(local_version, local_dir, latest_version, download_url, to
         if latest_version_num > local_version_num:
             print(f"{COLOUR.YELLOW}New version available: {latest_version}{COLOUR.STOP}")
             # Download and install the update
-            download_update(local_version, local_dir, latest_version, download_url, token)
+            download_update(exe_name, local_version, local_dir, latest_version, download_url, token)
         else:
             print(f"{COLOUR.GREEN}You are using the latest version.{COLOUR.STOP}")
     else:
         print(f"{COLOUR.GREEN}You are using the latest version.{COLOUR.STOP}")
 
-def download_update(local_version, local_dir, latest_version, download_url, token=None):
+def download_update(exe_name, local_version, local_dir, latest_version, download_url, token=None):
     headers = {}
     if token:
         headers['Authorization'] = f'token {token}'
-    
+    print(f"Downloading update {latest_version}...")
     response = requests.get(download_url, headers=headers)
     if response.status_code == 200:
-        new_file = f"batch_analyser_{latest_version}.exe"
+        new_file = exe_name.replace(local_version, latest_version)
         download_path = os.path.join(local_dir, new_file)
         with open(download_path, "wb") as f:
             f.write(response.content)
@@ -90,15 +90,7 @@ def download_update(local_version, local_dir, latest_version, download_url, toke
         delete = input(f"Close and delete current version {local_version}? (y/n): ").lower()
 
         current_exe = sys.argv[0]
-
-        # Batch script that opens the new version
-        bat_script = """
-        @echo off
-        timeout /t 2 >nul
-        start "" "{new_file}"
-        del "%~f0"
-        """.format(new_file=new_file)
-
+        bat_script = ""
         if delete == "y":
             print(f"{COLOUR.RED}This will delete the current version from your system and is irreversible.{COLOUR.STOP}")
             confirm = input(f"Input 'delete' to confirm deletion of version {local_version}: ").lower()
@@ -112,12 +104,20 @@ def download_update(local_version, local_dir, latest_version, download_url, toke
                 start "" "{new_file}"
                 del "%~f0"
                 """.format(current_exe=current_exe, new_file=new_file)
-            else:
-                print(f"{COLOUR.YELLOW}Old version will not be deleted.{COLOUR.STOP}")
-        
-        bat_file = "update_script.bat"
-        with open(bat_file, "w") as f:
-            f.write(bat_script)
+        else:
+            print(f"{COLOUR.YELLOW}Old version will not be deleted.{COLOUR.STOP}")
+            # Batch script that opens the new version
+            bat_script = """
+            @echo off
+            timeout /t 2 >nul
+            start "" "{new_file}"
+            del "%~f0"
+            """.format(new_file=new_file)
+
+        if bat_script != "":
+            bat_file = "update_script.bat"
+            with open(bat_file, "w") as f:
+                f.write(bat_script)
         
         print("Closing application for update...")
         time.sleep(2.0)
